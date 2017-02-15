@@ -116,7 +116,7 @@ module Rezept
       nil
     end
 
-    def _export_dsl_file(dsl, filenae)
+    def _export_dsl_file(dsl, filename)
       dsl = <<-EOS
 #! /usr/bin/env ruby
 
