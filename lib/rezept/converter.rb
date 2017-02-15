@@ -24,15 +24,6 @@ module Rezept
         k = k.to_s
         if k !~ /\A[_a-z]\w+\Z/i
           "_(#{k.inspect})"
-        elsif k == 'runCommand'
-          proc do |v, _|
-            v = eval("[#{v}]")
-            if v.length == 1
-              "#{k} #{v.first.inspect}"
-            else
-              "#{k} __script(<<-'EOS')\n#{v.join("\n")}\nEOS"
-            end
-          end
         else
           k
         end

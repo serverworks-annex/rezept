@@ -51,7 +51,7 @@ module Rezept
       end
 
       info("Document: '#{options['name']}'")
-      info("Document Type: '#{options['name']}'")
+      info("Document Type: '#{options['type']}'")
 
       case fmt
       when 'json'
