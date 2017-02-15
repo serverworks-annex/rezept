@@ -9,12 +9,12 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Serverworks Co.,Ltd."]
   spec.email         = ["terui@serverworks.co.jp"]
 
-  spec.summary       = %q{A tool to manage EC2 Systems Manager Documents.}
-  spec.description   = %q{A tool to manage EC2 Systems Manager Documents.}
+  spec.summary       = %q{A tool to manage EC2 Systems Manager (SSM) Documents with programmable DSL. }
+  spec.description   = %q{A tool to manage EC2 Systems Manager (SSM) Documents with programmable DSL. }
   spec.homepage      = "https://github.com/serverworks/rezept"
   spec.license       = "MIT"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features|Docfile)/}) }
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
