@@ -118,7 +118,7 @@ Command "My-RunShellScript" do
         action "aws:runShellScript"
         name "runShellScript"
         inputs do
-          commands __script(<<-'EOS')
+          runCommand __script(<<-'EOS')
 #! /bin/bash
 echo 1
 echo 2
@@ -145,7 +145,7 @@ Document Type: 'Command'
       "action": "aws:runShellScript",
       "name": "runShellScript",
       "inputs": {
-        "commands": [
+        "runCommand": [
           "#! /bin/bash",
           "echo 1",
           "echo 2",
@@ -172,7 +172,7 @@ Command "My-RunShellScript" do
         action "aws:runShellScript"
         name "runShellScript"
         inputs do
-          commands __script_file("script.sh")
+          runCommand __script_file("script.sh")
         end
       end
     end
@@ -203,7 +203,7 @@ Document Type: 'Command'
       "action": "aws:runShellScript",
       "name": "runShellScript",
       "inputs": {
-        "commands": [
+        "runCommand": [
           "#! /bin/bash",
           "echo 1",
           "echo 2",
@@ -229,7 +229,7 @@ template "runShellScriptTemplate" do
         action "aws:runShellScript"
         name "runShellScript"
         inputs do
-          commands __script(context.commands)
+          runCommand __script(context.commands)
         end
       end
     end
@@ -256,7 +256,7 @@ Document Type: 'Command'
       "action": "aws:runShellScript",
       "name": "runShellScript",
       "inputs": {
-        "commands": [
+        "runCommand": [
           "echo 1"
         ]
       }
