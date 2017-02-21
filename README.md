@@ -1,5 +1,7 @@
 # Rezept
 
+[![Gem Version](https://badge.fury.io/rb/rezept.svg)](https://badge.fury.io/rb/rezept)
+
 A tool to manage EC2 Systems Manager (SSM) Documents with programmable DSL.
 
 ## Installation
