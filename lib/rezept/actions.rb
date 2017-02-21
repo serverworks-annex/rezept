@@ -72,6 +72,85 @@ module Rezept
       _export_file(ret, options['output']) unless options['output'].nil?
     end
 
+    def run_command(options)
+      dry_run = options['dry_run'] ? '[Dry run] ' : ''
+
+      if options['instance_ids'].nil? and options['tags'].nil?
+        raise "Please specify the targets (--instance-ids/-i' or '--target-tags/-t')"
+      end
+
+      instances = @client.get_target_instances(
+        options['instance_ids'],
+        _tags_to_criteria(options['tags'], 'name')
+      )
+      info("#{dry_run}Target instances...")
+      instances.each do |instance|
+        name_tag = instance.tags.select {|i| i.key == 'Name'}
+        if name_tag.empty?
+          info("- #{instance.instance_id}")
+        else
+          info("- #{name_tag[0].value} (#{instance.instance_id})")
+        end
+      end
+
+      if dry_run.empty?
+        command = @client.run_command(
+          options['name'],
+          options['instance_ids'],
+          _tags_to_criteria(options['tags'], 'key'),
+          _convert_paraeters(options['parameters'])
+        )
+        _wait_all_results(command.command_id) if options['wait']
+      end
+    end
+
+    def _tags_to_criteria(targets, key_name)
+      return nil if targets.nil?
+      ret = []
+      targets.each {|k,v| ret << {key_name => "tag:#{k}", 'values' => v.split(',')} }
+      ret
+    end
+
+    def _convert_paraeters(parameters)
+      return nil if parameters.nil?
+      ret = {}
+      parameters.each do |k,v|
+        ret[k] = v.split(',')
+      end
+      ret
+    end
+
+    def _wait_all_results(command_id)
+      info("Wait for all results...")
+
+      done = false
+      failure = false
+      done_instances = []
+
+      until done do
+        sleep 1
+        invocations = @client.list_command_invocations(command_id)
+        invocations.each do |invocation|
+          break if done_instances.include?(invocation.instance_id)
+          unless ['Pending', 'InProgress'].include?(invocation.status)
+            case invocation.status
+            when 'Success'
+              info("- #{invocation.instance_id} => #{invocation.status}")
+            when 'Delayed'
+              warn("- #{invocation.instance_id} => #{invocation.status}")
+            else
+              fatal("- #{invocation.instance_id} => #{invocation.status}")
+              failure = true
+            end
+            done_instances << invocation.instance_id
+            done = true if done_instances.length == invocations.length
+          end
+        end
+      end
+
+      exit(1) if failure
+    end
+
     def _apply_docs(local, remote, dry_run)
       local.each do |l|
         l_ids = l.delete('account_ids')
