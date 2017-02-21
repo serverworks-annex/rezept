@@ -29,12 +29,23 @@ module Rezept
     end
 
     desc "convert", "Convert the documents to the other format"
-    option :name, aliases: '-n', desc: 'Name of document', type: :string, required: true
-    option :type, aliases: '-t', desc: 'Type of document (Command|Automation)', type: :string, required: true
+    option :name, aliases: '-n', desc: 'Name of the document', type: :string, required: true
+    option :type, aliases: '-t', desc: 'Type of the document (Command|Automation)', type: :string, required: true
     option :format, desc: 'Output format (json|ruby)', type: :string
     option :output, aliases: '-o', desc: 'Output filename (path)', type: :string
     def convert
       @actions.convert(options)
+    end
+
+    desc "run_command", "Run the commands"
+    option :name, aliases: '-n', desc: 'Name of the document', type: :string, required: true
+    option :instance_ids, aliases: '-i', desc: 'EC2 Instance IDs', type: :array
+    option :tags, aliases: '-t', desc: 'EC2 Instance tags', type: :hash
+    option :parameters, aliases: '-p', desc: 'Parameters for the document', type: :hash
+    option :dry_run, desc: 'Dry run (Only output the targets)', type: :boolean, default: false
+    option :wait, desc: 'Wait and check for all results', type: :boolean, default: false
+    def run_command
+      @actions.run_command(options)
     end
   end
 end

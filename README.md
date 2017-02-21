@@ -103,6 +103,33 @@ Options:
                                            # Default: true
 ```
 
+#### run_command
+Run the commands
+
+```
+$ rezept help run_command
+Usage:
+  rezept run_command -n, --name=NAME
+
+Options:
+  -n, --name=NAME                          # Name of the document
+  -i, [--instance-ids=one two three]       # EC2 Instance IDs
+  -t, [--tags=key:value]                   # EC2 Instance tags
+  -p, [--parameters=key:value]             # Parameters for the document
+      [--dry-run], [--no-dry-run]          # Dry run (Only output the targets)
+      [--wait], [--no-wait]                # Wait and check for all results
+  -f, [--file=FILE]                        # Configuration file
+                                           # Default: Docfile
+      [--color], [--no-color]              # Disable colorize
+                                           # Default: true
+      [--amazon-docs], [--no-amazon-docs]  # Include Amazon owned documents
+      [--dsl-content], [--no-dsl-content]  # Convert JSON contents to DSL
+                                           # Default: true
+```
+
+- If you specify multiple values to `tags` and `parameters`, separate them with commas(`,`).
+- When you use the `wait` option, the exit code will be `0` if the commands succeed on the all instances, else it will be `1`.
+
 ## Advanced methods
 
 #### Script styled commands (__script)

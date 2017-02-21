@@ -9,7 +9,8 @@ template "runShellScriptTemplate" do
         action "aws:runShellScript"
         name "runShellScript"
         inputs do
-          commands __script(context.commands)
+          runCommand __script(context.commands)
+          TimeoutSeconds 10
         end
       end
     end
@@ -18,7 +19,7 @@ end
 
 Command "My-RunShellScript" do
   account_ids []
-  include_template "runShellScriptTemplate", commands: "echo 1"
+  include_template "runShellScriptTemplate", commands: "echo 1 >> /tmp/result.txt"
 end
 
 Command "My-RunShellScript-2" do
@@ -31,29 +32,13 @@ Command "My-RunShellScript-2" do
         action "aws:runShellScript"
         name "runShellScript"
         inputs do
-          commands __script(<<-'EOS')
+          runCommand __script(<<-'EOS')
 #! /bin/bash
-echo 1
-echo 2
-echo 3
+echo 1 >> /tmp/results.txt
+echo 2 >> /tmp/results.txt
+exit 1
 EOS
-        end
-      end
-    end
-  end
-end
-
-Command "My-RunShellScript-3" do
-  account_ids []
-  content do
-    __dsl do
-      schemaVersion "2.0"
-      description "Run a shell script"
-      mainSteps do |*|
-        action "aws:runShellScript"
-        name "runShellScript"
-        inputs do
-          commands __script_file("script.sh")
+          TimeoutSeconds 10
         end
       end
     end

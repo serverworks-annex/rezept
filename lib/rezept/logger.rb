@@ -53,8 +53,8 @@ module Rezept
       super { Rezept::TermColor.red(msg) }
     end
 
-    def error(progname = nil, method_name = nil, msg, backtrace)
-      super(progname) { { method_name: method_name, message: msg, backtrace: backtrace } }
+    def error(msg)
+      super { Rezept::TermColor.red(msg) }
     end
 
     module Helper

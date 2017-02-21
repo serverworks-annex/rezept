@@ -5,6 +5,7 @@ module Rezept
 
     def initialize
       @ssm = Aws::SSM::Client.new
+      @ec2 = Aws::EC2::Client.new
     end
 
     def set_options(options)
@@ -57,7 +58,40 @@ module Rezept
         name: doc['name'],
         permission_type: 'Share',
         account_ids_to_add: add_ids,
-        account_ids_to_remove: rm_ids)
+        account_ids_to_remove: rm_ids
+      )
+    end
+
+    def get_target_instances(instance_ids, filters, next_token=nil)
+      instances = []
+
+      ret = @ec2.describe_instances(
+        instance_ids: instance_ids,
+        filters: filters,
+        next_token: next_token
+      )
+      ret.reservations.each do |reservation|
+        instances.concat(reservation.instances)
+      end
+
+      instances.concat(get_target_instances(instance_ids, filters, ret.next_token)) unless ret.next_token.nil?
+      instances
+    end
+
+    def run_command(name, instance_ids, targets, parameters)
+      @ssm.send_command(
+        document_name: name,
+        instance_ids: instance_ids,
+        targets: targets,
+        parameters: parameters
+      ).command
+    end
+
+    def list_command_invocations(command_id, next_token=nil)
+      ret = @ssm.list_command_invocations(command_id: command_id)
+      invocations = ret.command_invocations
+      invocations.concat(list_command_invocations(command_id, ret.next_token)) unless ret.next_token.nil?
+      invocations
     end
 
   end
