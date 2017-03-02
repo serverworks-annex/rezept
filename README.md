@@ -109,12 +109,14 @@ Run the commands
 ```
 $ rezept help run_command
 Usage:
-  rezept run_command -n, --name=NAME
+  rezept run_command -d, --document=DOCUMENT
 
 Options:
-  -n, --name=NAME                          # Name of the document
+  -d, --document=DOCUMENT                  # The name of the document
   -i, [--instance-ids=one two three]       # EC2 Instance IDs
   -t, [--tags=key:value]                   # EC2 Instance tags
+  -I, [--inventory=INVENTORY]              # The name of the inventory type
+  -C, [--conditions=one two three]         # The conditions to search inventories (ex. "Foo = Bar", "Buz > 1.0")
   -p, [--parameters=key:value]             # Parameters for the document
       [--dry-run], [--no-dry-run]          # Dry run (Only output the targets)
       [--wait], [--no-wait]                # Wait and check for all results
@@ -129,6 +131,29 @@ Options:
 
 - If you specify multiple values to `tags` and `parameters`, separate them with commas(`,`).
 - When you use the `wait` option, the exit code will be `0` if the commands succeed on the all instances, else it will be `1`.
+
+#### put_inventory
+Put the inventory
+
+```
+$ rezept help put_inventory
+Usage:
+  rezept put_inventory -c, --content=key:value -i, --instance-id=INSTANCE_ID -n, --name=NAME
+
+Options:
+  -n, --name=NAME                          # The name of the inventory type
+  -i, --instance-id=INSTANCE_ID            # EC2 Instance ID
+  -c, --content=key:value                  # Parameters for the document
+      [--schema-version=SCHEMA_VERSION]    # The schema version for the inventory item
+                                           # Default: 1.0
+  -f, [--file=FILE]                        # Configuration file
+                                           # Default: Docfile
+      [--color], [--no-color]              # Disable colorize
+                                           # Default: true
+      [--amazon-docs], [--no-amazon-docs]  # Include Amazon owned documents
+      [--dsl-content], [--no-dsl-content]  # Convert JSON contents to DSL
+                                           # Default: true
+```
 
 ## Advanced methods
 

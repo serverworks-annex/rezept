@@ -62,7 +62,7 @@ module Rezept
       )
     end
 
-    def get_target_instances(instance_ids, filters, next_token=nil)
+    def get_target_instances(instance_ids=nil, filters=nil, next_token=nil)
       instances = []
 
       ret = @ec2.describe_instances(
@@ -92,6 +92,28 @@ module Rezept
       invocations = ret.command_invocations
       invocations.concat(list_command_invocations(command_id, ret.next_token)) unless ret.next_token.nil?
       invocations
+    end
+
+    def put_inventory(instance_id, type_name, schema_version, content)
+      @ssm.put_inventory(
+        instance_id: instance_id,
+        items: [
+          {
+            type_name: type_name,
+            schema_version: schema_version,
+            capture_time: Time.now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            content: [content],
+          },
+        ],
+      )
+    end
+
+    def list_inventory_entries(instance_id, type_name, filters)
+      @ssm.list_inventory_entries(
+        instance_id: instance_id,
+        type_name: type_name,
+        filters: filters,
+      )
     end
 
   end
