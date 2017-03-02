@@ -50,18 +50,18 @@ module Rezept
         fmt = 'ruby'
       end
 
-      info("Document: '#{options['name']}'")
+      info("Document: '#{options['document']}'")
       info("Document Type: '#{options['type']}'")
 
       case fmt
       when 'json'
         docs = @converter.dslfile_to_h(options['file'])
-        docs = docs.select {|d| d['name'] == options['name'] }
+        docs = docs.select {|d| d['name'] == options['document'] }
         ret = JSON.pretty_generate(JSON.parse(docs[0]['content']))
         Rezept::Utils.print_json(ret)
       when 'ruby'
         doc = {}
-        doc['name'] = options['name']
+        doc['name'] = options['document']
         doc['document_type'] = options['type']
         doc['content'] = File.read(options['file'])
         ret = @converter.to_dsl(doc)
@@ -75,15 +75,64 @@ module Rezept
     def run_command(options)
       dry_run = options['dry_run'] ? '[Dry run] ' : ''
 
-      if options['instance_ids'].nil? and options['tags'].nil?
-        raise "Please specify the targets (--instance-ids/-i' or '--target-tags/-t')"
+      if options['instance_ids'].nil? and options['tags'].nil? and (options['inventory'].nil? or options['conditions'].nil?)
+        raise "Please specify the targets (--instance-ids/-i' or '--target-tags/-t' or '--inventroty/-I and --conditions/-C')"
       end
 
       instances = @client.get_target_instances(
         options['instance_ids'],
         _tags_to_criteria(options['tags'], 'name')
       )
+
       info("#{dry_run}Target instances...")
+
+      unless options['inventory'].nil?
+        instances = _filter_by_inventory(instances, options['inventory'], options['conditions'])
+        raise "Can't find target instances from inventories" if instances.empty?
+      end
+      _print_instances(instances)
+
+      instance_ids = options['instance_ids']
+      if instance_ids.nil? and not options['inventory'].nil?
+        instance_ids = []
+        instances.each {|i| instance_ids << i.instance_id}
+      end
+
+      if dry_run.empty?
+        command = @client.run_command(
+          options['document'],
+          instance_ids,
+          _tags_to_criteria(options['tags'], 'key'),
+          _convert_paraeters(options['parameters'])
+        )
+        _wait_all_results(command.command_id) if options['wait']
+      end
+    end
+
+    def _filter_by_inventory(instances, inventory, conditions)
+      filters = _conditions_to_filters(conditions)
+      ret = []
+      instances.each do |i|
+        inventory = @client.list_inventory_entries(
+          i.instance_id,
+          inventory,
+          filters,
+        )
+        ret << i unless inventory.entries.empty?
+      end
+      ret
+    end
+
+    def put_inventory(options)
+      @client.put_inventory(
+        options['instance_id'],
+        options['name'],
+        options['schema_version'],
+        options['content']
+      )
+    end
+
+    def _print_instances(instances)
       instances.each do |instance|
         name_tag = instance.tags.select {|i| i.key == 'Name'}
         if name_tag.empty?
@@ -92,16 +141,23 @@ module Rezept
           info("- #{name_tag[0].value} (#{instance.instance_id})")
         end
       end
+    end
 
-      if dry_run.empty?
-        command = @client.run_command(
-          options['name'],
-          options['instance_ids'],
-          _tags_to_criteria(options['tags'], 'key'),
-          _convert_paraeters(options['parameters'])
-        )
-        _wait_all_results(command.command_id) if options['wait']
+    def _conditions_to_filters(conditions)
+      ret = []
+      cond_simbols = {
+        '=' => 'Equal',
+        '!=' => 'NotEqual',
+        '<' =>  'LessThan',
+        '>' => 'GreaterThan',
+      }
+      regexp = /^(?<key>[^=!<>\s]+)\s*(?<type>[=!<>]+)+\s*(?<value>.+)$/
+
+      conditions.each do |c|
+        m = regexp.match(c)
+        ret << {key: m[:key], values: m[:value].split(','), type: cond_simbols[m[:type]]}
       end
+      ret
     end
 
     def _tags_to_criteria(targets, key_name)
