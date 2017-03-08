@@ -92,6 +92,7 @@ module Rezept
       if options['wait_entries']
         info("#{dry_run}Wait for entries of managed instances...")
         while instances.length > 0 and managed_instances.length == 0
+          sleep 1
           managed_instances = @client.get_managed_instances(instance_ids)
         end
       end
