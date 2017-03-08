@@ -45,7 +45,8 @@ module Rezept
     option :conditions, aliases: '-C', desc: 'The conditions to search inventories (ex. "Foo = Bar", "Buz > 1.0")', type: :array
     option :parameters, aliases: '-p', desc: 'Parameters for the document', type: :hash
     option :dry_run, desc: 'Dry run (Only output the targets)', type: :boolean, default: false
-    option :wait, desc: 'Wait and check for all results', type: :boolean, default: false
+    option :wait_entries, desc: 'Wait for entries of managed instances', type: :boolean, default: false
+    option :wait_results, desc: 'Wait and check for all results', type: :boolean, default: false
     def run_command
       @actions.run_command(options)
     end

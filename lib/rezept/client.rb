@@ -62,7 +62,7 @@ module Rezept
       )
     end
 
-    def get_target_instances(instance_ids=nil, filters=nil, next_token=nil)
+    def get_instances(instance_ids=nil, filters=nil, next_token=nil)
       instances = []
 
       ret = @ec2.describe_instances(
@@ -74,7 +74,22 @@ module Rezept
         instances.concat(reservation.instances)
       end
 
-      instances.concat(get_target_instances(instance_ids, filters, ret.next_token)) unless ret.next_token.nil?
+      instances.concat(get_instances(instance_ids, filters, ret.next_token)) unless ret.next_token.nil?
+      instances
+    end
+
+    def get_managed_instances(instance_ids, next_token=nil)
+      instances = []
+
+      ret = @ssm.describe_instance_information(
+        filters: [{
+          key: "InstanceIds",
+          values: instance_ids
+        }],
+        next_token: next_token
+      )
+      instances = ret.instance_information_list
+      instances.concat(get_target_instances(instance_ids, ret.next_token)) unless ret.next_token.nil?
       instances
     end
 

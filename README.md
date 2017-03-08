@@ -112,21 +112,22 @@ Usage:
   rezept run_command -d, --document=DOCUMENT
 
 Options:
-  -d, --document=DOCUMENT                  # The name of the document
-  -i, [--instance-ids=one two three]       # EC2 Instance IDs
-  -t, [--tags=key:value]                   # EC2 Instance tags
-  -I, [--inventory=INVENTORY]              # The name of the inventory type
-  -C, [--conditions=one two three]         # The conditions to search inventories (ex. "Foo = Bar", "Buz > 1.0")
-  -p, [--parameters=key:value]             # Parameters for the document
-      [--dry-run], [--no-dry-run]          # Dry run (Only output the targets)
-      [--wait], [--no-wait]                # Wait and check for all results
-  -f, [--file=FILE]                        # Configuration file
-                                           # Default: Docfile
-      [--color], [--no-color]              # Disable colorize
-                                           # Default: true
-      [--amazon-docs], [--no-amazon-docs]  # Include Amazon owned documents
-      [--dsl-content], [--no-dsl-content]  # Convert JSON contents to DSL
-                                           # Default: true
+  -d, --document=DOCUMENT                    # The name of the document
+  -i, [--instance-ids=one two three]         # EC2 Instance IDs
+  -t, [--tags=key:value]                     # EC2 Instance tags
+  -I, [--inventory=INVENTORY]                # The name of the inventory type
+  -C, [--conditions=one two three]           # The conditions to search inventories (ex. "Foo = Bar", "Buz > 1.0")
+  -p, [--parameters=key:value]               # Parameters for the document
+      [--dry-run], [--no-dry-run]            # Dry run (Only output the targets)
+      [--wait-entries], [--no-wait-entries]  # Wait for entries of managed instances
+      [--wait-results], [--no-wait-results]  # Wait and check for all results
+  -f, [--file=FILE]                          # Configuration file
+                                             # Default: Docfile
+      [--color], [--no-color]                # Disable colorize
+                                             # Default: true
+      [--amazon-docs], [--no-amazon-docs]    # Include Amazon owned documents
+      [--dsl-content], [--no-dsl-content]    # Convert JSON contents to DSL
+                                             # Default: true
 ```
 
 - If you specify multiple values to `tags` and `parameters`, separate them with commas(`,`).
@@ -167,7 +168,7 @@ Command "My-RunShellScript" do
   content do
     __dsl do
       schemaVersion "2.0"
-      description "my Run a shell script or specify the path to a script to run."
+      description "Run a shell script."
       mainSteps do |*|
         action "aws:runShellScript"
         name "runShellScript"
