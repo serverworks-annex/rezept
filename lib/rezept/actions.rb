@@ -74,28 +74,40 @@ module Rezept
 
     def run_command(options)
       dry_run = options['dry_run'] ? '[Dry run] ' : ''
+      @client.set_options(options)
 
       if options['instance_ids'].nil? and options['tags'].nil? and (options['inventory'].nil? or options['conditions'].nil?)
         raise "Please specify the targets (--instance-ids/-i' or '--target-tags/-t' or '--inventroty/-I and --conditions/-C')"
       end
 
-      instances = @client.get_target_instances(
+      instances = @client.get_instances(
         options['instance_ids'],
         _tags_to_criteria(options['tags'], 'name')
       )
 
+      instance_ids = []
+      instances.each {|i| instance_ids << i.instance_id }
+      managed_instances = @client.get_managed_instances(instance_ids)
+
+      if options['wait_entries']
+        info("#{dry_run}Wait for entries of managed instances...")
+        while instances.length > 0 and managed_instances.length == 0
+          managed_instances = @client.get_managed_instances(instance_ids)
+        end
+      end
+
       info("#{dry_run}Target instances...")
 
       unless options['inventory'].nil?
-        instances = _filter_by_inventory(instances, options['inventory'], options['conditions'])
-        raise "Can't find target instances from inventories" if instances.empty?
+        managed_instances = _filter_by_inventory(managed_instances, options['inventory'], options['conditions'])
+        raise "Can't find target instances from inventories" if managed_instances.empty?
       end
-      _print_instances(instances)
+      _print_instances(managed_instances)
 
       instance_ids = options['instance_ids']
       if instance_ids.nil? and not options['inventory'].nil?
         instance_ids = []
-        instances.each {|i| instance_ids << i.instance_id}
+        managed_instances.each {|i| instance_ids << i.instance_id}
       end
 
       if dry_run.empty?
@@ -105,7 +117,7 @@ module Rezept
           _tags_to_criteria(options['tags'], 'key'),
           _convert_paraeters(options['parameters'])
         )
-        _wait_all_results(command.command_id) if options['wait']
+        _wait_all_results(command.command_id) if options['wait_results']
       end
     end
 
@@ -113,12 +125,12 @@ module Rezept
       filters = _conditions_to_filters(conditions)
       ret = []
       instances.each do |i|
-        inventory = @client.list_inventory_entries(
+        inventory_entries = @client.list_inventory_entries(
           i.instance_id,
           inventory,
           filters,
         )
-        ret << i unless inventory.entries.empty?
+        ret << i unless inventory_entries.entries.empty?
       end
       ret
     end
@@ -134,11 +146,10 @@ module Rezept
 
     def _print_instances(instances)
       instances.each do |instance|
-        name_tag = instance.tags.select {|i| i.key == 'Name'}
-        if name_tag.empty?
+        if instance.name.nil?
           info("- #{instance.instance_id}")
         else
-          info("- #{name_tag[0].value} (#{instance.instance_id})")
+          info("- #{instance.name} (#{instance.instance_id})")
         end
       end
     end
