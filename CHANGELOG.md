@@ -1,3 +1,6 @@
+## 0.3.1
+- Bugfix: `Aws::SSM::Errors::ThrottlingException: Rate exceeded` error
+
 ## 0.3.0
 - Add `--wait-entries option` to `run_command` [#3][]
   - Change `--wait` option to `--wait-results` option
