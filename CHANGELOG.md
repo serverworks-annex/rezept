@@ -1,3 +1,6 @@
+## 0.4.0
+- Add `prefix` option to `apply` [#4][]
+
 ## 0.3.1
 - Bugfix: `Aws::SSM::Errors::ThrottlingException: Rate exceeded` error
 
