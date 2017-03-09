@@ -23,6 +23,7 @@ module Rezept
     end
 
     desc "apply", "Apply the documents"
+    option :prefix, desc: 'The prefix of the documents (All documents are targeted by default)', type: :string
     option :dry_run, desc: 'Dry run (Only output the difference)', type: :boolean, default: false
     def apply
       @actions.apply(options)
