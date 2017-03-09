@@ -22,7 +22,7 @@ Or install it yourself as:
 
 ## Usage
 
-#### General
+### General
 
 ```
 $ rezept
@@ -42,7 +42,7 @@ Options:
                                            # Default: true
 ```
 
-#### apply
+### apply
 Apply the documents
 
 ```
@@ -51,6 +51,7 @@ Usage:
   rezept apply
 
 Options:
+      [--prefix=PREFIX]                    # The prefix of the documents (All documents are targeted by default)
       [--dry-run], [--no-dry-run]          # Dry run (Only output the difference)
   -f, [--file=FILE]                        # Configuration file
                                            # Default: Docfile
@@ -61,7 +62,7 @@ Options:
                                            # Default: true
 ```
 
-#### convert
+### convert
 Convert the documents to the other format
 
 ```
@@ -83,7 +84,7 @@ Options:
                                            # Default: true
 ```
 
-#### export
+### export
 Export the documents
 
 ```
@@ -103,7 +104,7 @@ Options:
                                            # Default: true
 ```
 
-#### run_command
+### run_command
 Run the commands
 
 ```
@@ -133,7 +134,7 @@ Options:
 - If you specify multiple values to `tags` and `parameters`, separate them with commas(`,`).
 - When you use the `wait` option, the exit code will be `0` if the commands succeed on the all instances, else it will be `1`.
 
-#### put_inventory
+### put_inventory
 Put the inventory
 
 ```
@@ -158,7 +159,7 @@ Options:
 
 ## Advanced methods
 
-#### Script styled commands (__script)
+### Script styled commands (__script)
 
 - Docfile
 
@@ -212,7 +213,7 @@ Document Type: 'Command'
 }
 ```
 
-#### Commands from the other script file (__script_file)
+### Commands from the other script file (__script_file)
 
 - Docfile
 
@@ -270,7 +271,7 @@ Document Type: 'Command'
 }
 ```
 
-#### Templating
+### Templating
 
 - Docfile
 
