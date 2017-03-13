@@ -1,3 +1,6 @@
+## 0.4.1
+- Bugfix: `color` option is not working
+
 ## 0.4.0
 - Add `prefix` option to `apply` [#4][]
 
