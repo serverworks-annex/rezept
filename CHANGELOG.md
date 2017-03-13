@@ -1,5 +1,8 @@
+## 0.4.2
+- Bugfix: Diff detection fails on `--no-color` option
+
 ## 0.4.1
-- Bugfix: `color` option is not working
+- Bugfix: `--color`/`--no-color` option is not working
 
 ## 0.4.0
 - Add `prefix` option to `apply` [#4][]
