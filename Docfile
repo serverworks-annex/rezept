@@ -17,9 +17,9 @@ template "runShellScriptTemplate" do
   end
 end
 
-Command "My-RunShellScript" do
+Command "Test-Example-RunShellScript" do
   account_ids []
-  include_template "runShellScriptTemplate", commands: "echo 1 >> /tmp/result.txt"
+  include_template "runShellScriptTemplate", commands: "echo 123 >> /tmp/result.txt"
 end
 
 Command "My-RunShellScript-2" do

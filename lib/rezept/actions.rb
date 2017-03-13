@@ -13,6 +13,7 @@ module Rezept
     def export(options)
       @converter.set_options(options)
       @client.set_options(options)
+      Rezept::TermColor.color = options['color']
       docs = @client.get_documents
 
       if options['write']
@@ -35,6 +36,7 @@ module Rezept
     def apply(options)
       @converter.set_options(options)
       @client.set_options(options)
+      Rezept::TermColor.color = options['color']
       dry_run = options['dry_run'] ? '[Dry run] ' : ''
       local = @converter.dslfile_to_h(options['file'])
       remote = @client.get_documents
@@ -45,10 +47,10 @@ module Rezept
         remote.reject!{|d| not d['name'] =~ prefix }
       end
 
-      _apply_docs(local, remote, dry_run)
+      _apply_docs(local, remote, dry_run, options)
     end
 
-    def _apply_docs(local, remote, dry_run)
+    def _apply_docs(local, remote, dry_run, options)
       local.each do |l|
         l_ids = l.delete('account_ids')
         r_ids = []
@@ -59,7 +61,7 @@ module Rezept
           @client.create_document(l) if dry_run.empty?
         else
           r_ids = r.delete('account_ids')
-          diff = Rezept::Utils.diff(@converter, r, l)
+          diff = Rezept::Utils.diff(@converter, r, l, options['color'])
 
           if diff == "\n"
             info("#{dry_run}No changes '#{l['name']}'")
@@ -87,6 +89,7 @@ module Rezept
 
     def convert(options)
       @converter.set_options(options)
+      Rezept::TermColor.color = options['color']
 
       fmt = 'unknown'
 
@@ -121,6 +124,7 @@ module Rezept
     def run_command(options)
       dry_run = options['dry_run'] ? '[Dry run] ' : ''
       @client.set_options(options)
+      Rezept::TermColor.color = options['color']
 
       if options['instance_ids'].nil? and options['tags'].nil? and (options['inventory'].nil? or options['conditions'].nil?)
         raise "Please specify the targets (--instance-ids/-i' or '--target-tags/-t' or '--inventroty/-I and --conditions/-C')"

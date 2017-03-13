@@ -4,6 +4,11 @@ require 'singleton'
 module Rezept
   class TermColor
     class << self
+      @@color = true
+
+      def color=(color)
+        @@color = color
+      end
 
       def green(msg)
         colorize 32, msg
@@ -18,7 +23,7 @@ module Rezept
       end
 
       def colorize(num, msg)
-        "\e[#{num}m#{msg}\e[0m"
+        @@color ? "\e[#{num}m#{msg}\e[0m" : msg
       end
 
     end
