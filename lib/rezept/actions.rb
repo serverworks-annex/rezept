@@ -63,7 +63,7 @@ module Rezept
           r_ids = r.delete('account_ids')
           diff = Rezept::Utils.diff(@converter, r, l, options['color'])
 
-          if diff == "\n"
+          if diff == "\n" or diff.empty?
             info("#{dry_run}No changes '#{l['name']}'")
           else
             warn("#{dry_run}Update the document #{l['name'].inspect}")
